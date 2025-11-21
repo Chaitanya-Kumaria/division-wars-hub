@@ -36,33 +36,32 @@ export interface Event {
   icon: string;
 }
 
-// Placeholder events - will be updated based on actual tournament
 export const SPORTS_EVENTS: Event[] = [
-  { id: "cricket", name: "Cricket", type: "sports", icon: "🏏" },
-  { id: "football", name: "Football", type: "sports", icon: "⚽" },
-  { id: "basketball", name: "Basketball", type: "sports", icon: "🏀" },
-  { id: "volleyball", name: "Volleyball", type: "sports", icon: "🏐" },
-  { id: "badminton", name: "Badminton", type: "sports", icon: "🏸" },
-  { id: "table-tennis", name: "Table Tennis", type: "sports", icon: "🏓" },
   { id: "chess", name: "Chess", type: "sports", icon: "♟️" },
+  { id: "badminton", name: "Badminton", type: "sports", icon: "🏸" },
+  { id: "basketball", name: "Basketball", type: "sports", icon: "🏀" },
+  { id: "table-tennis", name: "Table Tennis", type: "sports", icon: "🏓" },
   { id: "carrom", name: "Carrom", type: "sports", icon: "🎯" },
-  { id: "athletics", name: "Athletics", type: "sports", icon: "🏃" },
-  { id: "swimming", name: "Swimming", type: "sports", icon: "🏊" },
-  { id: "lawn-tennis", name: "Lawn Tennis", type: "sports", icon: "🎾" },
-  { id: "squash", name: "Squash", type: "sports", icon: "🎾" },
-  { id: "kabaddi", name: "Kabaddi", type: "sports", icon: "🤼" },
+  { id: "pool", name: "Pool", type: "sports", icon: "🎱" },
   { id: "throwball", name: "Throwball", type: "sports", icon: "🏐" },
-  { id: "dodgeball", name: "Dodgeball", type: "sports", icon: "⚾" },
-  { id: "relay", name: "Relay", type: "sports", icon: "🏃‍♂️" },
+  { id: "foosball", name: "Foosball", type: "sports", icon: "⚽" },
+  { id: "volleyball", name: "Volleyball", type: "sports", icon: "🏐" },
+  { id: "esports-fifa", name: "E-Sports FIFA", type: "sports", icon: "🎮" },
+  { id: "esports-valo", name: "E-Sports Valo", type: "sports", icon: "🎮" },
+  { id: "box-cricket", name: "Box Cricket", type: "sports", icon: "🏏" },
+  { id: "football", name: "Football", type: "sports", icon: "⚽" },
+  { id: "pickleball", name: "Pickleball", type: "sports", icon: "🏸" },
+  { id: "squash", name: "Squash", type: "sports", icon: "🎾" },
+  { id: "lawn-tennis", name: "Lawn Tennis", type: "sports", icon: "🎾" },
 ];
 
 export const CULTURAL_EVENTS: Event[] = [
-  { id: "dance", name: "Dance", type: "cultural", icon: "💃" },
-  { id: "singing", name: "Singing", type: "cultural", icon: "🎤" },
-  { id: "drama", name: "Drama", type: "cultural", icon: "🎭" },
-  { id: "fashion-show", name: "Fashion Show", type: "cultural", icon: "👗" },
-  { id: "standup-comedy", name: "Stand-up Comedy", type: "cultural", icon: "😄" },
-  { id: "poetry", name: "Poetry", type: "cultural", icon: "📝" },
-  { id: "art", name: "Art", type: "cultural", icon: "🎨" },
+  { id: "group-skit", name: "Group Skit", type: "cultural", icon: "🎭" },
+  { id: "group-dance", name: "Group Dance", type: "cultural", icon: "💃" },
+  { id: "group-musical", name: "Group Musical", type: "cultural", icon: "🎵" },
+  { id: "roast-comedy", name: "Roast Comedy", type: "cultural", icon: "🎤" },
   { id: "quiz", name: "Quiz", type: "cultural", icon: "🧠" },
+  { id: "rotating-art", name: "Rotating Art", type: "cultural", icon: "🎨" },
+  { id: "meme-wars", name: "Meme Wars", type: "cultural", icon: "😂" },
+  { id: "beg-borrow-steal", name: "Beg, Borrow, Steal", type: "cultural", icon: "🔍" },
 ];
