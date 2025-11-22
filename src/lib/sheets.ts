@@ -1,6 +1,6 @@
 // Google Sheets Integration
-// TODO: Add your Google Sheets URL here
-const GOOGLE_SHEETS_URL = "YOUR_GOOGLE_SHEETS_URL_HERE";
+const GOOGLE_SHEETS_URL = "https://docs.google.com/spreadsheets/d/1DkeCAbV7DE9oytGfQ_cC2L7DNTuyrEe8DuIj6vK8prA/edit?usp=sharing";
+const SPREADSHEET_ID = "1DkeCAbV7DE9oytGfQ_cC2L7DNTuyrEe8DuIj6vK8prA";
 
 // Placeholder for Google Sheets API integration
 export const fetchStandings = async () => {
