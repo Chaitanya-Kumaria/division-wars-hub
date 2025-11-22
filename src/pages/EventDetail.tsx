@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import StandingsTable from "@/components/StandingsTable";
 import { SPORTS_EVENTS, CULTURAL_EVENTS, DIVISIONS, type Standings, type Fixture } from "@/types/tournament";
-import { fetchEventStandings, fetchFixtures } from "@/lib/sheets";
+import { fetchEventStandings, fetchFixtures, fetchEventRules } from "@/lib/sheets";
 import { ArrowLeft, Calendar, Trophy, BookOpen } from "lucide-react";
 
 const EventDetail = () => {
@@ -17,6 +17,7 @@ const EventDetail = () => {
   
   const [standings, setStandings] = useState<Standings[]>([]);
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
+  const [rules, setRules] = useState<string>("");
   
   const allEvents = [...SPORTS_EVENTS, ...CULTURAL_EVENTS];
   const event = allEvents.find(e => e.id === eventId);
@@ -29,12 +30,14 @@ const EventDetail = () => {
 
   const loadEventData = async () => {
     if (!eventId) return;
-    const [standingsData, fixturesData] = await Promise.all([
+    const [standingsData, fixturesData, rulesData] = await Promise.all([
       fetchEventStandings(eventId),
       fetchFixtures(eventId),
+      fetchEventRules(eventId),
     ]);
     setStandings(standingsData);
     setFixtures(fixturesData);
+    setRules(rulesData);
   };
 
   if (!event) {
@@ -207,17 +210,15 @@ const EventDetail = () => {
                 <CardTitle>Event Rules & Guidelines</CardTitle>
               </CardHeader>
               <CardContent className="prose prose-invert max-w-none">
-                <div className="space-y-4 text-foreground">
-                  <p className="text-muted-foreground">
-                    Event-specific rules will be added here.
-                  </p>
-                  {/* TODO: Add rule book content here */}
-                  <div className="border border-dashed border-border rounded-lg p-8 text-center">
-                    <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground">
-                      Rules and guidelines for {event.name} will be published soon.
-                    </p>
-                  </div>
+                <div className="space-y-4 text-foreground whitespace-pre-wrap">
+                  {rules || (
+                    <div className="border border-dashed border-border rounded-lg p-8 text-center">
+                      <BookOpen className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-muted-foreground">
+                        Rules and guidelines for {event.name} will be published soon.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

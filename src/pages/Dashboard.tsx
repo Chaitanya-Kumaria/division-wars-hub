@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import StandingsTable from "@/components/StandingsTable";
 import { SPORTS_EVENTS, CULTURAL_EVENTS, type Standings } from "@/types/tournament";
-import { fetchStandings } from "@/lib/sheets";
+import { fetchStandings, fetchSportsStandings, fetchCulturalStandings } from "@/lib/sheets";
 import { isAuthenticated, setAuthenticated } from "@/lib/auth";
 import { Trophy, LogOut, UserCog, Activity, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -23,11 +23,14 @@ const Dashboard = () => {
   }, []);
 
   const loadStandings = async () => {
-    const data = await fetchStandings();
-    setOverallStandings(data);
-    // TODO: Fetch separate sports and cultural standings
-    setSportsStandings(data);
-    setCulturalStandings(data);
+    const [overall, sports, cultural] = await Promise.all([
+      fetchStandings(),
+      fetchSportsStandings(),
+      fetchCulturalStandings(),
+    ]);
+    setOverallStandings(overall);
+    setSportsStandings(sports);
+    setCulturalStandings(cultural);
   };
 
   const handleLogout = () => {
