@@ -82,7 +82,12 @@ def get_event_standings(event_id):
     """Get standings for a specific event"""
     try:
         raw_data = sheets.get_event_standings(event_id)
-        standings = calculate_standings(raw_data)
+        
+        # Get calculation logic from sport/cultural module
+        module = SPORTS_MODULES.get(event_id) or CULTURAL_MODULES.get(event_id)
+        calc_func = module.calculate_division_points if module else None
+        
+        standings = calculate_standings(raw_data, calc_func)
         return jsonify(standings)
     except Exception as e:
         return jsonify({'error': str(e)}), 500

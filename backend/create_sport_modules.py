@@ -6,6 +6,7 @@ Run this to create all sport-specific Python files
 import os
 
 SPORTS = [
+    ('chess', 'Chess'),
     ('badminton', 'Badminton'),
     ('basketball', 'Basketball'),
     ('table_tennis', 'Table Tennis'),
@@ -90,12 +91,36 @@ def calculate_division_points(performance_data):
     
     Args:
         performance_data: Dictionary containing performance metrics
+                          (e.g., {{'gold': 1, 'silver': 0, 'matches_won': 5}})
     
     Returns:
         Total points for the division
     """
-    # TODO: Implement {name}-specific point calculation
-    return 0
+    # TODO: Implement {name}-specific point calculation logic here
+    # This is where you define how points are awarded for this specific sport
+    
+    points = 0
+    # Example logic:
+    # points += performance_data.get('gold', 0) * 5
+    # points += performance_data.get('matches_won', 0) * 2
+    
+    return points
+
+
+def get_player_requirements():
+    """
+    Define the player structure/requirements for {name}.
+    
+    Returns:
+        Dictionary defining player requirements
+    """
+    # TODO: Define player details structure
+    return {{
+        "min_players": 0,
+        "max_players": 0,
+        "roles": [], # e.g. ["Captain", "Goalkeeper"]
+        "gender_requirements": {{}} # e.g. {{"male": 0, "female": 0}}
+    }}
 '''
 
 def create_modules():
@@ -103,19 +128,17 @@ def create_modules():
     os.makedirs('sports', exist_ok=True)
     for filename, name in SPORTS:
         filepath = f'sports/{filename}.py'
-        if not os.path.exists(filepath):
-            with open(filepath, 'w') as f:
-                f.write(TEMPLATE.format(name=name))
-            print(f'Created {filepath}')
+        with open(filepath, 'w') as f:
+            f.write(TEMPLATE.format(name=name))
+        print(f'Created/Updated {filepath}')
     
     # Create cultural modules
     os.makedirs('cultural', exist_ok=True)
     for filename, name in CULTURAL:
         filepath = f'cultural/{filename}.py'
-        if not os.path.exists(filepath):
-            with open(filepath, 'w') as f:
-                f.write(TEMPLATE.format(name=name))
-            print(f'Created {filepath}')
+        with open(filepath, 'w') as f:
+            f.write(TEMPLATE.format(name=name))
+        print(f'Created/Updated {filepath}')
 
 if __name__ == '__main__':
     create_modules()

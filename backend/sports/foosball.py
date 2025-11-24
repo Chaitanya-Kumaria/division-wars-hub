@@ -1,10 +1,10 @@
 """
-Chess Event Logic
+Foosball Event Logic
 """
 
 def validate_score(division, gold, silver, bronze):
     """
-    Validate Chess scores before updating
+    Validate Foosball scores before updating
     
     Args:
         division: Division name (A, B, C, D, E)
@@ -13,7 +13,7 @@ def validate_score(division, gold, silver, bronze):
     Returns:
         (is_valid, error_message)
     """
-    # TODO: Add Chess-specific validation rules
+    # TODO: Add Foosball-specific validation rules
     
     if gold < 0 or silver < 0 or bronze < 0:
         return False, "Medal counts cannot be negative"
@@ -23,14 +23,14 @@ def validate_score(division, gold, silver, bronze):
 
 def get_rules():
     """
-    Get Chess event rules
+    Get Foosball event rules
     
     Returns:
         String containing formatted rules
     """
-    # TODO: Add actual Chess tournament rules
+    # TODO: Add actual Foosball tournament rules
     return """
-# Chess Tournament Rules
+# Foosball Tournament Rules
 
 ## Format
 To be announced
@@ -50,7 +50,7 @@ This section will be updated with complete rules.
 
 def calculate_division_points(performance_data):
     """
-    Calculate points for a division in Chess
+    Calculate points for a division in Foosball
     
     Args:
         performance_data: Dictionary containing performance metrics
@@ -59,7 +59,7 @@ def calculate_division_points(performance_data):
     Returns:
         Total points for the division
     """
-    # TODO: Implement Chess-specific point calculation logic here
+    # TODO: Implement Foosball-specific point calculation logic here
     # This is where you define how points are awarded for this specific sport
     
     points = 0
@@ -72,7 +72,7 @@ def calculate_division_points(performance_data):
 
 def get_player_requirements():
     """
-    Define the player structure/requirements for Chess.
+    Define the player structure/requirements for Foosball.
     
     Returns:
         Dictionary defining player requirements

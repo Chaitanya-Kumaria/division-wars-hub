@@ -1,9 +1,10 @@
-def calculate_standings(raw_data):
+def calculate_standings(raw_data, calc_func=None):
     """
     Calculate standings with points based on medals
     
     Args:
         raw_data: List of lists from Google Sheets [Division, Gold, Silver, Bronze, Points]
+        calc_func: Optional function to calculate points for a specific event
     
     Returns:
         List of standings dictionaries
@@ -19,9 +20,18 @@ def calculate_standings(raw_data):
         silver = int(row[2]) if len(row) > 2 and row[2] else 0
         bronze = int(row[3]) if len(row) > 3 and row[3] else 0
         
-        # TODO: Update points calculation logic as per tournament rules
-        # Current placeholder: Gold=3pts, Silver=2pts, Bronze=1pt
-        points = (gold * 3) + (silver * 2) + (bronze * 1)
+        if calc_func:
+            # Use custom calculation logic from the sport module
+            performance_data = {
+                'gold': gold,
+                'silver': silver,
+                'bronze': bronze
+            }
+            points = calc_func(performance_data)
+        else:
+            # Default fallback logic
+            # Gold=3pts, Silver=2pts, Bronze=1pt
+            points = (gold * 3) + (silver * 2) + (bronze * 1)
         
         standings.append({
             'division': division,
