@@ -27,13 +27,7 @@ export const fetchEventStandings = async (eventId: string) => {
     return await response.json();
   } catch (error) {
     console.error("Error fetching event standings:", error);
-    return [
-      { division: "A" as const, gold: 0, silver: 0, bronze: 0, points: 0 },
-      { division: "B" as const, gold: 0, silver: 0, bronze: 0, points: 0 },
-      { division: "C" as const, gold: 0, silver: 0, bronze: 0, points: 0 },
-      { division: "D" as const, gold: 0, silver: 0, bronze: 0, points: 0 },
-      { division: "E" as const, gold: 0, silver: 0, bronze: 0, points: 0 },
-    ];
+    return { standings: [], table_structure: [] };
   }
 };
 

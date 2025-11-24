@@ -2,24 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DIVISIONS, SPORTS_EVENTS, CULTURAL_EVENTS, type Division } from "@/types/tournament";
-import { updateScore } from "@/lib/sheets";
+import { SPORTS_EVENTS, CULTURAL_EVENTS } from "@/types/tournament";
 import { useToast } from "@/hooks/use-toast";
 import { isAuthenticated } from "@/lib/auth";
-import { ArrowLeft, Save, PlusCircle } from "lucide-react";
+import { ArrowLeft, PlusCircle } from "lucide-react";
+import MatchEntryForm from "@/components/MatchEntryForm";
 
 const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [selectedEvent, setSelectedEvent] = useState("");
-  const [selectedDivision, setSelectedDivision] = useState<Division | "">("");
-  const [goldMedals, setGoldMedals] = useState("");
-  const [silverMedals, setSilverMedals] = useState("");
-  const [bronzeMedals, setBronzeMedals] = useState("");
 
   if (!isAuthenticated()) {
     navigate("/auth");
@@ -27,45 +21,7 @@ const Admin = () => {
   }
 
   const allEvents = [...SPORTS_EVENTS, ...CULTURAL_EVENTS];
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!selectedEvent || !selectedDivision) {
-      toast({
-        title: "Missing Information",
-        description: "Please select both event and division",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const data = {
-      eventId: selectedEvent,
-      division: selectedDivision,
-      gold: parseInt(goldMedals) || 0,
-      silver: parseInt(silverMedals) || 0,
-      bronze: parseInt(bronzeMedals) || 0,
-    };
-
-    try {
-      await updateScore(data);
-      toast({
-        title: "Score Updated",
-        description: "The score has been successfully recorded",
-      });
-      // Reset form
-      setGoldMedals("");
-      setSilverMedals("");
-      setBronzeMedals("");
-    } catch (error) {
-      toast({
-        title: "Update Failed",
-        description: "Failed to update the score. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
+  const selectedEventData = allEvents.find(e => e.id === selectedEvent);
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,108 +45,50 @@ const Admin = () => {
           </TabsList>
 
           <TabsContent value="score-update" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Update Event Scores</CardTitle>
-                <CardDescription>
-                  Record medals and points for each division
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="event">Select Event</Label>
-                      <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-                        <SelectTrigger id="event">
-                          <SelectValue placeholder="Choose an event" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
-                            Sports Events
-                          </div>
-                          {SPORTS_EVENTS.map((event) => (
-                            <SelectItem key={event.id} value={event.id}>
-                              {event.icon} {event.name}
-                            </SelectItem>
-                          ))}
-                          <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground mt-2">
-                            Cultural Events
-                          </div>
-                          {CULTURAL_EVENTS.map((event) => (
-                            <SelectItem key={event.id} value={event.id}>
-                              {event.icon} {event.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="division">Select Division</Label>
-                      <Select value={selectedDivision} onValueChange={(value) => setSelectedDivision(value as Division)}>
-                        <SelectTrigger id="division">
-                          <SelectValue placeholder="Choose a division" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(DIVISIONS).map(([key, value]) => (
-                            <SelectItem key={key} value={key}>
-                              Division {key} - {value.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Select Event</CardTitle>
+                  <CardDescription>
+                    Choose an event to record match results
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <Select value={selectedEvent} onValueChange={setSelectedEvent}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose an event" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
+                          Sports Events
+                        </div>
+                        {SPORTS_EVENTS.map((event) => (
+                          <SelectItem key={event.id} value={event.id}>
+                            {event.icon} {event.name}
+                          </SelectItem>
+                        ))}
+                        <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground mt-2">
+                          Cultural Events
+                        </div>
+                        {CULTURAL_EVENTS.map((event) => (
+                          <SelectItem key={event.id} value={event.id}>
+                            {event.icon} {event.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
+                </CardContent>
+              </Card>
 
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="gold">Gold Medals</Label>
-                      <Input
-                        id="gold"
-                        type="number"
-                        min="0"
-                        value={goldMedals}
-                        onChange={(e) => setGoldMedals(e.target.value)}
-                        placeholder="0"
-                        className="bg-muted"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="silver">Silver Medals</Label>
-                      <Input
-                        id="silver"
-                        type="number"
-                        min="0"
-                        value={silverMedals}
-                        onChange={(e) => setSilverMedals(e.target.value)}
-                        placeholder="0"
-                        className="bg-muted"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="bronze">Bronze Medals</Label>
-                      <Input
-                        id="bronze"
-                        type="number"
-                        min="0"
-                        value={bronzeMedals}
-                        onChange={(e) => setBronzeMedals(e.target.value)}
-                        placeholder="0"
-                        className="bg-muted"
-                      />
-                    </div>
-                  </div>
-
-                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                    <Save className="w-4 h-4 mr-2" />
-                    Submit Score Update
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+              {selectedEvent && selectedEventData && (
+                <MatchEntryForm 
+                  eventId={selectedEvent}
+                  eventName={selectedEventData.name}
+                />
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="fixture-management" className="mt-6">
