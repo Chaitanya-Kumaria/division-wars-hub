@@ -25,7 +25,8 @@ class SheetsConnector:
                 'Sports': [],
                 'Cultural': [],
                 'Fixtures': [],
-                'Chess': [] # Mock data for Chess
+                'Chess': [],
+                'Matches': [] # Store match-by-match data
             }
     
     def get_overall_standings(self):
@@ -211,3 +212,92 @@ class SheetsConnector:
         # This is a simplified version - you'd need fixture ID logic
         
         return data
+    
+    def get_event_matches(self, event_id):
+        """Get all matches for a specific event"""
+        if self.is_mock:
+            matches = [m for m in self.mock_data.get('Matches', []) if m.get('eventId') == event_id]
+            return matches
+        
+        result = self.sheet.values().get(
+            spreadsheetId=self.SPREADSHEET_ID,
+            range='Matches!A2:H'  # Event, Team, Opponent, Result, MatchPoints, GamePoints, Date, RoundNumber
+        ).execute()
+        
+        rows = result.get('values', [])
+        matches = []
+        
+        for row in rows:
+            if len(row) > 0 and row[0] == event_id:
+                matches.append({
+                    'eventId': row[0] if len(row) > 0 else '',
+                    'team': row[1] if len(row) > 1 else '',
+                    'opponent': row[2] if len(row) > 2 else '',
+                    'result': row[3] if len(row) > 3 else '',
+                    'match_points': float(row[4]) if len(row) > 4 and row[4] else 0,
+                    'game_points': float(row[5]) if len(row) > 5 and row[5] else 0,
+                    'date': row[6] if len(row) > 6 else '',
+                    'round': int(row[7]) if len(row) > 7 and row[7] else 0
+                })
+        
+        return matches
+    
+    def add_match(self, match_data):
+        """Add a new match result"""
+        event_id = match_data.get('eventId')
+        team1 = match_data.get('team1')
+        team2 = match_data.get('team2')
+        result = match_data.get('result')
+        match_points = match_data.get('match_points', 0)
+        game_points = match_data.get('game_points', 0)
+        date = match_data.get('date', '')
+        round_num = match_data.get('round', 1)
+        
+        if self.is_mock:
+            if 'Matches' not in self.mock_data:
+                self.mock_data['Matches'] = []
+            
+            # Add for team1
+            self.mock_data['Matches'].append({
+                'eventId': event_id,
+                'team': team1,
+                'opponent': team2,
+                'result': result,
+                'match_points': match_points,
+                'game_points': game_points,
+                'date': date,
+                'round': round_num
+            })
+            
+            # Add opposite result for team2
+            opposite_result = 'loss' if result == 'win' else ('win' if result == 'loss' else 'draw')
+            opposite_match_points = 0 if result == 'win' else (2 if result == 'loss' else 1)
+            opposite_game_points = 1 - game_points if result != 'draw' else game_points
+            
+            self.mock_data['Matches'].append({
+                'eventId': event_id,
+                'team': team2,
+                'opponent': team1,
+                'result': opposite_result,
+                'match_points': opposite_match_points,
+                'game_points': opposite_game_points,
+                'date': date,
+                'round': round_num
+            })
+            
+            return match_data
+        
+        # Add both entries to Matches sheet
+        self.sheet.values().append(
+            spreadsheetId=self.SPREADSHEET_ID,
+            range='Matches!A:H',
+            valueInputOption='RAW',
+            body={'values': [
+                [event_id, team1, team2, result, match_points, game_points, date, round_num],
+                [event_id, team2, team1, 'loss' if result == 'win' else ('win' if result == 'loss' else 'draw'),
+                 0 if result == 'win' else (2 if result == 'loss' else 1),
+                 1 - game_points if result != 'draw' else game_points, date, round_num]
+            ]}
+        ).execute()
+        
+        return match_data

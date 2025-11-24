@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import StandingsTable from "@/components/StandingsTable";
-import { SPORTS_EVENTS, CULTURAL_EVENTS, DIVISIONS, type Standings, type Fixture } from "@/types/tournament";
+import EventStandingsTable from "@/components/EventStandingsTable";
+import { SPORTS_EVENTS, CULTURAL_EVENTS, DIVISIONS, type Fixture } from "@/types/tournament";
 import { fetchEventStandings, fetchFixtures, fetchEventRules } from "@/lib/sheets";
 import { ArrowLeft, Calendar, Trophy, BookOpen } from "lucide-react";
 
@@ -15,7 +15,8 @@ const EventDetail = () => {
   const navigate = useNavigate();
   const type = searchParams.get("type") as "sports" | "cultural";
   
-  const [standings, setStandings] = useState<Standings[]>([]);
+  const [standings, setStandings] = useState<any[]>([]);
+  const [tableStructure, setTableStructure] = useState<any[]>([]);
   const [fixtures, setFixtures] = useState<Fixture[]>([]);
   const [rules, setRules] = useState<string>("");
   
@@ -30,12 +31,13 @@ const EventDetail = () => {
 
   const loadEventData = async () => {
     if (!eventId) return;
-    const [standingsData, fixturesData, rulesData] = await Promise.all([
+    const [standingsResponse, fixturesData, rulesData] = await Promise.all([
       fetchEventStandings(eventId),
       fetchFixtures(eventId),
       fetchEventRules(eventId),
     ]);
-    setStandings(standingsData);
+    setStandings(standingsResponse.standings || []);
+    setTableStructure(standingsResponse.table_structure || []);
     setFixtures(fixturesData);
     setRules(rulesData);
   };
@@ -89,7 +91,10 @@ const EventDetail = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <StandingsTable standings={standings} />
+            <EventStandingsTable 
+              standings={standings}
+              tableStructure={tableStructure}
+            />
           </CardContent>
         </Card>
 

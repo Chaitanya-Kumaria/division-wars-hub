@@ -1,23 +1,43 @@
 """
-Chess Event Logic
+Chess Event Logic - Swiss System Tournament
 """
 
-def validate_score(division, gold, silver, bronze):
+def validate_match(match_data):
     """
-    Validate Chess scores before updating
+    Validate Chess match data before updating
     
     Args:
-        division: Division name (A, B, C, D, E)
-        gold, silver, bronze: Medal counts
+        match_data: Dictionary with team1, team2, result, match_points, game_points
     
     Returns:
         (is_valid, error_message)
     """
-    # TODO: Add Chess-specific validation rules
+    required_fields = ['team1', 'team2', 'result']
+    for field in required_fields:
+        if field not in match_data or not match_data[field]:
+            return False, f"Missing required field: {field}"
     
+    valid_results = ['win', 'loss', 'draw']
+    if match_data['result'] not in valid_results:
+        return False, f"Invalid result. Must be one of: {valid_results}"
+    
+    return True, None
+
+
+def calculate_match_points(result):
+    """Calculate match points based on result"""
+    points_map = {
+        'win': 2,
+        'draw': 1,
+        'loss': 0
+    }
+    return points_map.get(result, 0)
+
+
+def validate_score(division, gold, silver, bronze):
+    """Legacy validation - kept for compatibility"""
     if gold < 0 or silver < 0 or bronze < 0:
         return False, "Medal counts cannot be negative"
-    
     return True, None
 
 
@@ -50,24 +70,58 @@ This section will be updated with complete rules.
 
 def calculate_division_points(performance_data):
     """
-    Calculate points for a division in Chess
+    Calculate points for a division in Chess based on match results
     
     Args:
-        performance_data: Dictionary containing performance metrics
-                          (e.g., {'gold': 1, 'silver': 0, 'matches_won': 5})
+        performance_data: Dictionary with 'matches' list containing match results
     
     Returns:
-        Total points for the division
+        Dictionary with played, won, lost, match_points, game_points
     """
-    # TODO: Implement Chess-specific point calculation logic here
-    # This is where you define how points are awarded for this specific sport
+    matches = performance_data.get('matches', [])
     
-    points = 0
-    # Example logic:
-    # points += performance_data.get('gold', 0) * 5
-    # points += performance_data.get('matches_won', 0) * 2
+    stats = {
+        'played': len(matches),
+        'won': 0,
+        'lost': 0,
+        'drawn': 0,
+        'match_points': 0,
+        'game_points': 0
+    }
     
-    return points
+    for match in matches:
+        result = match.get('result', '').lower()
+        if result == 'win':
+            stats['won'] += 1
+            stats['match_points'] += 2
+            stats['game_points'] += match.get('game_points', 1)
+        elif result == 'draw':
+            stats['drawn'] += 1
+            stats['match_points'] += 1
+            stats['game_points'] += match.get('game_points', 0.5)
+        elif result == 'loss':
+            stats['lost'] += 1
+            stats['game_points'] += match.get('game_points', 0)
+    
+    return stats
+
+
+def get_table_structure():
+    """
+    Define the standings table structure for Chess
+    
+    Returns:
+        List of column definitions
+    """
+    return [
+        {'key': 'division', 'label': 'Division', 'type': 'text'},
+        {'key': 'played', 'label': 'Played', 'type': 'number'},
+        {'key': 'won', 'label': 'Won', 'type': 'number'},
+        {'key': 'lost', 'label': 'Lost', 'type': 'number'},
+        {'key': 'drawn', 'label': 'Drawn', 'type': 'number'},
+        {'key': 'match_points', 'label': 'Match Points', 'type': 'number'},
+        {'key': 'game_points', 'label': 'Game Points', 'type': 'number'}
+    ]
 
 
 def get_player_requirements():
