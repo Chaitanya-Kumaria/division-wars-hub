@@ -8,16 +8,31 @@ load_dotenv()
 class SheetsConnector:
     def __init__(self):
         self.SPREADSHEET_ID = os.getenv('SPREADSHEET_ID')
-        self.SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-        self.credentials = Credentials.from_service_account_file(
-            os.getenv('GOOGLE_CREDENTIALS_FILE'),
-            scopes=self.SCOPES
-        )
-        self.service = build('sheets', 'v4', credentials=self.credentials)
-        self.sheet = self.service.spreadsheets()
+        self.is_mock = self.SPREADSHEET_ID == 'dummy_spreadsheet_id'
+        
+        if not self.is_mock:
+            self.SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+            self.credentials = Credentials.from_service_account_file(
+                os.getenv('GOOGLE_CREDENTIALS_FILE'),
+                scopes=self.SCOPES
+            )
+            self.service = build('sheets', 'v4', credentials=self.credentials)
+            self.sheet = self.service.spreadsheets()
+        else:
+            print("Running in MOCK mode with dummy credentials")
+            self.mock_data = {
+                'Overall': [],
+                'Sports': [],
+                'Cultural': [],
+                'Fixtures': [],
+                'Chess': [] # Mock data for Chess
+            }
     
     def get_overall_standings(self):
         """Get overall standings from 'Overall' sheet"""
+        if self.is_mock:
+            return self.mock_data.get('Overall', [])
+            
         result = self.sheet.values().get(
             spreadsheetId=self.SPREADSHEET_ID,
             range='Overall!A2:E'  # Assuming: Division, Gold, Silver, Bronze, Points
@@ -26,6 +41,9 @@ class SheetsConnector:
     
     def get_sports_standings(self):
         """Get sports standings from 'Sports' sheet"""
+        if self.is_mock:
+            return self.mock_data.get('Sports', [])
+
         result = self.sheet.values().get(
             spreadsheetId=self.SPREADSHEET_ID,
             range='Sports!A2:E'
@@ -34,6 +52,9 @@ class SheetsConnector:
     
     def get_cultural_standings(self):
         """Get cultural standings from 'Cultural' sheet"""
+        if self.is_mock:
+            return self.mock_data.get('Cultural', [])
+
         result = self.sheet.values().get(
             spreadsheetId=self.SPREADSHEET_ID,
             range='Cultural!A2:E'
@@ -43,6 +64,9 @@ class SheetsConnector:
     def get_event_standings(self, event_id):
         """Get standings for a specific event"""
         sheet_name = event_id.replace('-', '_').title()
+        if self.is_mock:
+            return self.mock_data.get(sheet_name, [])
+
         result = self.sheet.values().get(
             spreadsheetId=self.SPREADSHEET_ID,
             range=f'{sheet_name}!A2:E'
@@ -51,12 +75,14 @@ class SheetsConnector:
     
     def get_event_fixtures(self, event_id):
         """Get fixtures for a specific event from Fixtures sheet"""
-        result = self.sheet.values().get(
-            spreadsheetId=self.SPREADSHEET_ID,
-            range='Fixtures!A2:I'  # Event, Div1, Div2, Date, Time, Venue, Status, Winner, Score
-        ).execute()
-        
-        rows = result.get('values', [])
+        if self.is_mock:
+            rows = self.mock_data.get('Fixtures', [])
+        else:
+            result = self.sheet.values().get(
+                spreadsheetId=self.SPREADSHEET_ID,
+                range='Fixtures!A2:I'  # Event, Div1, Div2, Date, Time, Venue, Status, Winner, Score
+            ).execute()
+            rows = result.get('values', [])
         fixtures = []
         
         for idx, row in enumerate(rows):
@@ -80,6 +106,25 @@ class SheetsConnector:
         """Update score for a specific event and division"""
         sheet_name = event_id.replace('-', '_').title()
         
+        if self.is_mock:
+            # Mock update logic
+            print(f"MOCK UPDATE: {sheet_name} - {division}: G{gold} S{silver} B{bronze}")
+            # Simple mock implementation: append or update in list
+            if sheet_name not in self.mock_data:
+                self.mock_data[sheet_name] = []
+            
+            found = False
+            for row in self.mock_data[sheet_name]:
+                if row[0] == division:
+                    row[1] = gold
+                    row[2] = silver
+                    row[3] = bronze
+                    found = True
+                    break
+            if not found:
+                self.mock_data[sheet_name].append([division, gold, silver, bronze, 0])
+            return True
+
         # Find the row for the division
         result = self.sheet.values().get(
             spreadsheetId=self.SPREADSHEET_ID,
@@ -115,6 +160,22 @@ class SheetsConnector:
     
     def add_fixture(self, data):
         """Add a new fixture"""
+        if self.is_mock:
+            if 'Fixtures' not in self.mock_data:
+                self.mock_data['Fixtures'] = []
+            self.mock_data['Fixtures'].append([
+                data['eventId'],
+                data['division1'],
+                data['division2'],
+                data['date'],
+                data['time'],
+                data['venue'],
+                'scheduled',
+                '',
+                ''
+            ])
+            return data
+
         self.sheet.values().append(
             spreadsheetId=self.SPREADSHEET_ID,
             range='Fixtures!A:I',
@@ -135,6 +196,10 @@ class SheetsConnector:
     
     def update_fixture(self, data):
         """Update fixture status and results"""
+        if self.is_mock:
+            # Mock update logic
+            return data
+
         # Find the fixture row
         result = self.sheet.values().get(
             spreadsheetId=self.SPREADSHEET_ID,
