@@ -7,9 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SPORTS_EVENTS, CULTURAL_EVENTS } from "@/types/tournament";
 import { useToast } from "@/hooks/use-toast";
 import { isAuthenticated } from "@/lib/auth";
-import { ArrowLeft, PlusCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import MatchEntryForm from "@/components/MatchEntryForm";
 import TableTennisMatchForm from "@/components/TableTennisMatchForm";
+import FixtureManagement from "@/components/FixtureManagement";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -84,7 +85,7 @@ const Admin = () => {
               </Card>
 
               {selectedEvent && selectedEventData && (
-                selectedEvent === "table_tennis" ? (
+                selectedEvent === "table-tennis" ? (
                   <TableTennisMatchForm 
                     eventId={selectedEvent}
                     eventName={selectedEventData.name}
@@ -100,23 +101,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="fixture-management" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Add New Fixture</CardTitle>
-                <CardDescription>
-                  Schedule new matches for events
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12 text-muted-foreground">
-                  <PlusCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p>Fixture management form coming soon</p>
-                  <p className="text-sm mt-2">
-                    This will allow you to add scheduled games with date, time, venue, and participating divisions.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <FixtureManagement />
           </TabsContent>
         </Tabs>
       </main>

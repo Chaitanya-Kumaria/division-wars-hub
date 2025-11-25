@@ -67,56 +67,70 @@ export default function TableTennisMatchForm({ eventId, eventName }: TableTennis
 
     setIsSubmitting(true);
 
-    const matchData = {
-      event_id: eventId,
-      tie_id: tieId,
-      phase,
-      date,
-      time,
-      team_a: teamA,
-      team_b: teamB,
-      matches: matches.map(m => ({
-        match_type: m.match_type,
-        team_a_players: m.team_a_players,
-        team_b_players: m.team_b_players,
-        winner: m.winner,
-        score: m.score
-      })),
-      tie_winner: tieResult.winner,
-      points: tieResult.points
-    };
-
     try {
-      const API_BASE_URL = "http://localhost:5000/api";
-      const response = await fetch(`${API_BASE_URL}/match/add`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(matchData),
-      });
+      const { supabase } = await import("@/integrations/supabase/client");
 
-      if (response.ok) {
-        toast.success(`Tie result recorded! ${tieResult.name} wins (${tieResult.points} points)`);
-        // Reset form
-        setTieId("");
-        setPhase("");
-        setDate("");
-        setTime("");
-        setTeamA("");
-        setTeamB("");
-        setMatches([
-          { match_type: "MS", team_a_players: "", team_b_players: "", winner: "", score: "" },
-          { match_type: "WS", team_a_players: "", team_b_players: "", winner: "", score: "" },
-          { match_type: "MD", team_a_players: "", team_b_players: "", winner: "", score: "" },
-          { match_type: "WD", team_a_players: "", team_b_players: "", winner: "", score: "" },
-          { match_type: "XD", team_a_players: "", team_b_players: "", winner: "", score: "" },
-        ]);
-      } else {
-        const error = await response.json();
-        toast.error(error.error || "Failed to submit tie result");
+      // Insert main match record
+      const { data: matchData, error: matchError } = await supabase
+        .from("matches")
+        .insert([{
+          event_id: eventId,
+          division_a: teamA,
+          division_b: teamB,
+          match_date: date || null,
+          match_time: time || null,
+          phase,
+          winner: tieResult.winner === "team_a" ? teamA : teamB,
+          match_points_a: tieResult.winner === "team_a" ? tieResult.points : 0,
+          match_points_b: tieResult.winner === "team_b" ? tieResult.points : 0,
+          match_data: { tie_id: tieId, tie_result: tieResult }
+        }])
+        .select()
+        .single();
+
+      if (matchError) throw matchError;
+
+      // Insert individual tie matches
+      const tieMatches = matches
+        .filter(m => m.winner && m.team_a_players && m.team_b_players)
+        .map((m, index) => ({
+          match_id: matchData.id,
+          tie_id: tieId,
+          match_number: index + 1,
+          match_type: m.match_type,
+          team_a_players: m.team_a_players,
+          team_b_players: m.team_b_players,
+          winner: m.winner,
+          score: m.score || null
+        }));
+
+      if (tieMatches.length > 0) {
+        const { error: tieMatchesError } = await supabase
+          .from("tt_tie_matches")
+          .insert(tieMatches);
+
+        if (tieMatchesError) throw tieMatchesError;
       }
+
+      toast.success(`Tie result recorded! ${tieResult.name} wins (${tieResult.points} points)`);
+      
+      // Reset form
+      setTieId("");
+      setPhase("");
+      setDate("");
+      setTime("");
+      setTeamA("");
+      setTeamB("");
+      setMatches([
+        { match_type: "MS", team_a_players: "", team_b_players: "", winner: "", score: "" },
+        { match_type: "WS", team_a_players: "", team_b_players: "", winner: "", score: "" },
+        { match_type: "MD", team_a_players: "", team_b_players: "", winner: "", score: "" },
+        { match_type: "WD", team_a_players: "", team_b_players: "", winner: "", score: "" },
+        { match_type: "XD", team_a_players: "", team_b_players: "", winner: "", score: "" },
+      ]);
     } catch (error) {
-      toast.error("Network error - is the backend running?");
-      console.error(error);
+      console.error("Error submitting tie result:", error);
+      toast.error("Failed to submit tie result");
     } finally {
       setIsSubmitting(false);
     }
