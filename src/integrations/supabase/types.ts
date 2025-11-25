@@ -14,7 +14,285 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      divisions: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          total_points: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          total_points?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          total_points?: number | null
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          icon: string | null
+          id: string
+          name: string
+          status: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string | null
+          icon?: string | null
+          id: string
+          name: string
+          status?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          status?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
+      fixtures: {
+        Row: {
+          created_at: string | null
+          division_a: string
+          division_b: string
+          event_id: string
+          id: string
+          notes: string | null
+          phase: string | null
+          scheduled_date: string | null
+          scheduled_time: string | null
+          status: string | null
+          updated_at: string | null
+          venue: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          division_a: string
+          division_b: string
+          event_id: string
+          id?: string
+          notes?: string | null
+          phase?: string | null
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          status?: string | null
+          updated_at?: string | null
+          venue?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          division_a?: string
+          division_b?: string
+          event_id?: string
+          id?: string
+          notes?: string | null
+          phase?: string | null
+          scheduled_date?: string | null
+          scheduled_time?: string | null
+          status?: string | null
+          updated_at?: string | null
+          venue?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fixtures_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          created_at: string | null
+          division_a: string
+          division_b: string
+          event_id: string
+          fixture_id: string | null
+          game_points_a: number | null
+          game_points_b: number | null
+          id: string
+          match_data: Json | null
+          match_date: string | null
+          match_points_a: number | null
+          match_points_b: number | null
+          match_time: string | null
+          phase: string | null
+          result: string | null
+          winner: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          division_a: string
+          division_b: string
+          event_id: string
+          fixture_id?: string | null
+          game_points_a?: number | null
+          game_points_b?: number | null
+          id?: string
+          match_data?: Json | null
+          match_date?: string | null
+          match_points_a?: number | null
+          match_points_b?: number | null
+          match_time?: string | null
+          phase?: string | null
+          result?: string | null
+          winner?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          division_a?: string
+          division_b?: string
+          event_id?: string
+          fixture_id?: string | null
+          game_points_a?: number | null
+          game_points_b?: number | null
+          id?: string
+          match_data?: Json | null
+          match_date?: string | null
+          match_points_a?: number | null
+          match_points_b?: number | null
+          match_time?: string | null
+          phase?: string | null
+          result?: string | null
+          winner?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_fixture_id_fkey"
+            columns: ["fixture_id"]
+            isOneToOne: false
+            referencedRelation: "fixtures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      standings: {
+        Row: {
+          division: string
+          drawn: number | null
+          event_id: string
+          game_points: number | null
+          id: string
+          lost: number | null
+          match_losses: number | null
+          match_points: number | null
+          match_wins: number | null
+          played: number | null
+          points: number | null
+          position: number | null
+          updated_at: string | null
+          won: number | null
+        }
+        Insert: {
+          division: string
+          drawn?: number | null
+          event_id: string
+          game_points?: number | null
+          id?: string
+          lost?: number | null
+          match_losses?: number | null
+          match_points?: number | null
+          match_wins?: number | null
+          played?: number | null
+          points?: number | null
+          position?: number | null
+          updated_at?: string | null
+          won?: number | null
+        }
+        Update: {
+          division?: string
+          drawn?: number | null
+          event_id?: string
+          game_points?: number | null
+          id?: string
+          lost?: number | null
+          match_losses?: number | null
+          match_points?: number | null
+          match_wins?: number | null
+          played?: number | null
+          points?: number | null
+          position?: number | null
+          updated_at?: string | null
+          won?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standings_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tt_tie_matches: {
+        Row: {
+          created_at: string | null
+          id: string
+          match_id: string
+          match_number: number
+          match_type: string
+          score: string | null
+          team_a_players: string
+          team_b_players: string
+          tie_id: string
+          winner: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          match_id: string
+          match_number: number
+          match_type: string
+          score?: string | null
+          team_a_players: string
+          team_b_players: string
+          tie_id: string
+          winner: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          match_id?: string
+          match_number?: number
+          match_type?: string
+          score?: string | null
+          team_a_players?: string
+          team_b_players?: string
+          tie_id?: string
+          winner?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tt_tie_matches_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
