@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isAuthenticated } from "@/lib/auth";
 import { ArrowLeft, PlusCircle } from "lucide-react";
 import MatchEntryForm from "@/components/MatchEntryForm";
+import TableTennisMatchForm from "@/components/TableTennisMatchForm";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -83,10 +84,17 @@ const Admin = () => {
               </Card>
 
               {selectedEvent && selectedEventData && (
-                <MatchEntryForm 
-                  eventId={selectedEvent}
-                  eventName={selectedEventData.name}
-                />
+                selectedEvent === "table_tennis" ? (
+                  <TableTennisMatchForm 
+                    eventId={selectedEvent}
+                    eventName={selectedEventData.name}
+                  />
+                ) : (
+                  <MatchEntryForm 
+                    eventId={selectedEvent}
+                    eventName={selectedEventData.name}
+                  />
+                )
               )}
             </div>
           </TabsContent>
