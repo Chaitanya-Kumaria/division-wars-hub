@@ -21,7 +21,6 @@ interface TableTennisMatchFormProps {
 }
 
 export default function TableTennisMatchForm({ eventId, eventName }: TableTennisMatchFormProps) {
-  const [tieId, setTieId] = useState("");
   const [phase, setPhase] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -54,10 +53,13 @@ export default function TableTennisMatchForm({ eventId, eventName }: TableTennis
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!tieId || !phase || !teamA || !teamB) {
+    if (!phase || !teamA || !teamB) {
       toast.error("Please fill in all required tie details");
       return;
     }
+    
+    // Auto-generate tie ID
+    const tieId = `${eventId}-${teamA}-${teamB}-${Date.now()}`;
 
     const tieResult = calculateTieWinner();
     if (!tieResult) {
@@ -115,7 +117,6 @@ export default function TableTennisMatchForm({ eventId, eventName }: TableTennis
       toast.success(`Tie result recorded! ${tieResult.name} wins (${tieResult.points} points)`);
       
       // Reset form
-      setTieId("");
       setPhase("");
       setDate("");
       setTime("");
@@ -151,16 +152,6 @@ export default function TableTennisMatchForm({ eventId, eventName }: TableTennis
             <h3 className="font-semibold">Tie Details</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="tie-id">Tie ID *</Label>
-                <Input
-                  id="tie-id"
-                  value={tieId}
-                  onChange={(e) => setTieId(e.target.value)}
-                  placeholder="e.g., TT-001"
-                  required
-                />
-              </div>
-              <div>
                 <Label htmlFor="phase">Phase *</Label>
                 <Select value={phase} onValueChange={setPhase} required>
                   <SelectTrigger>
@@ -175,13 +166,12 @@ export default function TableTennisMatchForm({ eventId, eventName }: TableTennis
                 </Select>
               </div>
               <div>
-                <Label htmlFor="date">Date *</Label>
+                <Label htmlFor="date">Date</Label>
                 <Input
                   id="date"
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  required
                 />
               </div>
               <div>
