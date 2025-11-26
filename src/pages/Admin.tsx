@@ -10,6 +10,7 @@ import { isAuthenticated } from "@/lib/auth";
 import { ArrowLeft } from "lucide-react";
 import MatchEntryForm from "@/components/MatchEntryForm";
 import TableTennisMatchForm from "@/components/TableTennisMatchForm";
+import BadmintonMatchForm from "@/components/BadmintonMatchForm";
 import FixtureManagement from "@/components/FixtureManagement";
 
 const Admin = () => {
@@ -87,6 +88,11 @@ const Admin = () => {
               {selectedEvent && selectedEventData && (
                 selectedEvent === "table-tennis" ? (
                   <TableTennisMatchForm 
+                    eventId={selectedEvent}
+                    eventName={selectedEventData.name}
+                  />
+                ) : selectedEvent === "badminton" ? (
+                  <BadmintonMatchForm 
                     eventId={selectedEvent}
                     eventName={selectedEventData.name}
                   />
